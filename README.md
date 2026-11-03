@@ -61,6 +61,9 @@ OPENCODE_PANES_PACKAGE_DIR=~/.dotfiles/.config/opencode/panes/opencode-panes npm
 
 See [docs/beginner-setup.md](docs/beginner-setup.md) for a detailed setup guide.
 
+See [docs/tools-to-try.md](docs/tools-to-try.md) for apps and tools I want to
+start using.
+
 ## Manual Setup
 
 If you prefer to set up manually:
