@@ -22,6 +22,17 @@ if [ -f "$DOTFILES_DIR/.config/opencode/package-lock.json" ]; then
     )
 fi
 
+# Install npm dependencies for skills that ship a lockfile (e.g. stageshow).
+# node_modules is gitignored, so it has to be rebuilt on each machine.
+# A failure here only warns: the skill's docs still work without its scripts.
+for lockfile in "$DOTFILES_DIR"/.agents/skills/*/package-lock.json; do
+    [ -f "$lockfile" ] || continue
+    skill_dir="$(dirname "$lockfile")"
+    echo "Installing dependencies for skill: $(basename "$skill_dir")"
+    (cd "$skill_dir" && npm ci --ignore-scripts --no-audit --no-fund) \
+        || echo "  Warning: npm ci failed in $skill_dir (skill scripts may not run)" >&2
+done
+
 # Function to create symlink with backup
 create_symlink() {
     local source="$1"
