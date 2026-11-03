@@ -284,20 +284,30 @@
       "skillFolderHash": "d6a0d9bf3cdc78cbfcbd6466ac5fd3deffb52877",
       "installedAt": "2026-08-28T16:19:29.146Z",
       "updatedAt": "2026-10-08T17:19:40.020Z"
+    },
+    "stageshow": {
+      "source": "benjitaylor/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/benjitaylor/skills.git",
+      "skillPath": "stageshow/SKILL.md",
+      "skillFolderHash": "5f24a58c1b28ba9d208e576e3c6267ccd1fc1769",
+      "installedAt": "2026-11-01T20:41:57.614Z",
+      "updatedAt": "2026-11-01T20:41:57.614Z"
     }
   },
   "lastSelectedAgents": [
     "amp",
-    "antigravity",
-    "antigravity-cli",
     "cline",
     "codex",
     "cursor",
-    "deepagents",
+    "droid",
+    "fx",
     "gemini-cli",
     "github-copilot",
+    "kilo",
     "kimi-code-cli",
     "opencode",
+    "pi",
     "warp",
     "zed",
     "claude-code"

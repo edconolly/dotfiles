@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{Product}} design system: proposals compared</title>
+<!--
+  Comparison page template (me-design-system skill). Fill {{…}}; add one <td> per proposal in each row and one
+  <section class="col"> per proposal. Deliberately plain styling so it doesn't favour any proposal.
+  Swatches: <span class="sw"><i style="background:#HEX"></i>…</span>
+-->
+<style>
+  :root { --ink:#1d1d1f; --muted:#5b5b60; --line:#d6d6db; --soft:#f5f5f7; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 16px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--ink); background: #fff; }
+  main { max-width: 1320px; margin: 0 auto; padding: 48px 24px 96px; }
+  h1 { font-size: 34px; line-height: 1.15; margin: 0 0 12px; }
+  h2 { font-size: 22px; margin: 56px 0 12px; }
+  h3 { font-size: 18px; margin: 0 0 6px; }
+  p { max-width: 72ch; }
+  .muted { color: var(--muted); }
+  a { color: inherit; }
+  a:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .table-wrap { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; min-width: 760px; font-size: 14px; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+  thead th { background: var(--soft); font-weight: 600; }
+  tbody th { font-weight: 600; width: 14%; }
+  .sw { display: inline-flex; gap: 4px; vertical-align: middle; }
+  .sw i { width: 18px; height: 18px; border-radius: 3px; border: 1px solid rgba(0,0,0,.15); display: inline-block; }
+  .cols { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; margin-top: 16px; }
+  .col img { width: 100%; height: auto; border: 1px solid var(--line); border-radius: 6px; display: block; }
+  .col .shot { max-height: 760px; overflow: hidden; border-radius: 6px; }
+  .col ul { padding-left: 18px; margin: 8px 0 0; font-size: 15px; }
+  .open { display: inline-block; margin: 10px 0 14px; font-weight: 600; }
+</style>
+</head>
+<body>
+<main>
+  <h1>{{Product}} design system: {{N}} proposals</h1>
+  <p class="muted">For {{owner}}, {{date}}. Each proposal is a whole system (principles, voice, tokens, components with states, chart rules, sample screens, ownership) built from the same <a href="BRIEF.md">brief</a>. They differ in decisions, not only colour. Nothing here is adopted.</p>
+
+  <h2>Side by side</h2>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th></th><th>{{A. Name}}</th><th>{{B. Name}}</th></tr></thead>
+    <tbody>
+      <tr><th>Idea it carries</th><td></td><td></td></tr>
+      <tr><th>Brand vs product</th><td></td><td></td></tr>
+      <tr><th>Feel</th><td></td><td></td></tr>
+      <tr><th>Core colours</th><td></td><td></td></tr>
+      <tr><th>Status colours</th><td></td><td></td></tr>
+      <tr><th>Type</th><td></td><td></td></tr>
+      <tr><th>Density</th><td></td><td></td></tr>
+      <tr><th>Signature idea</th><td></td><td></td></tr>
+      <tr><th>Dark theme</th><td></td><td></td></tr>
+      <tr><th>Biggest risk</th><td></td><td></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h2>What each looks like</h2>
+  <div class="cols">
+    <section class="col">
+      <h3>{{A. Name}}</h3>
+      <a class="open" href="{{a-slug}}/index.html">Open proposal {{A}}</a>
+      <div class="shot"><img src="_shots/{{a-slug}}-composites.jpg" alt="{{what the screenshot shows}}"></div>
+      <ul><li>{{strength}}</li><li>{{strength}}</li></ul>
+    </section>
+  </div>
+
+  <h2>Shared across all</h2>
+  <ul><li>{{fixed rules from the brief}}</li></ul>
+
+  <h2>How to judge them</h2>
+  <ul><li>{{criteria the owner chose; each should make at least one proposal lose}}</li></ul>
+</main>
+</body>
+</html>

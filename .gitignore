@@ -17,6 +17,9 @@
 .config/opencode/bun.lock
 .config/opencode/service-*.json
 
+# Dependencies installed by skills (e.g. stageshow); rebuild with npm ci
+**/node_modules/
+
 # Temporary local skill backups
 .agents/backup_skills/
 
