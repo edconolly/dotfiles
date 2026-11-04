@@ -1,6 +1,6 @@
 ---
 name: me-design-system
-description: Create a proper design system for any product or company. Grounds it in the product, proposes several clearly different directions as short descriptions for the user to pick from, then has parallel subagents build each one as a full system (principles, voice, DTCG tokens, components with states, data-viz rules, sample screens, governance) with scripted contrast, colour-blind and layout checks, and a side-by-side comparison page. Use whenever the user wants to define, explore, compare, propose or start a design system, design language, token set, brand-and-product visual system or UI kit for an app, site or company, even if they only say "make it look consistent", "give us a visual identity for the product" or "a style for the dashboard and website". Not for a single page, a logo, or marketing collateral on its own.
+description: Create a proper design system for any product or company. Grounds it in the product and a competitor audit, proposes several clearly different directions (in form and personality, not just colour) as short descriptions for the user to pick from, then has parallel subagents build each one as a full system (principles, voice, DTCG tokens, components with states, data-viz rules, sample screens, governance) with scripted contrast, colour-blind and layout checks, and a side-by-side comparison page. Use whenever the user wants to define, explore, compare, propose or start a design system, design language, token set, brand-and-product visual system or UI kit for an app, site or company, even if they only say "make it look consistent", "give us a visual identity for the product" or "a style for the dashboard and website". Not for a single page, a logo, or marketing collateral on its own.
 ---
 
 # Design system proposals
@@ -33,18 +33,30 @@ research only for what's specific to this product, e.g. accessibility law for it
 (banking, healthcare, government), or exemplar systems in its category. Use a subagent that must open every
 source it cites and mark anything it couldn't open.
 
+**Competitor audit (always).** "Different" must mean different in the market, not only from each other. A
+subagent visits the public websites (and any public product screenshots or docs) of 6–8 competitors buyers will
+compare against, and writes `<research>/competitors.md`: per competitor, ground colour and colour mood band, lead
+type class, form (corners, edges, density), tone of voice, and what buyers recognise them by. It saves one
+screenshot of each homepage for a contact sheet (for internal comparison only; never reuse their assets). The
+summary table goes into the brief's market section.
+
 ### 3. Propose directions as descriptions first
-Follow `references/directions.md`. A subagent drafts three directions (two to four is fine) that differ on
-surface axes (idea, brand↔product model, mood, theme, type, colour, signature idea) **and form axes** (corners,
-edges, density, button and status construction, product layout, website composition).
-Review the draft for generic colours, claims the product can't back, and false "only one that…" lines. Then
+Follow `references/directions.md`. First decide with the user whether **status colours** are fixed for all
+directions or varied on purpose. Then a subagent drafts three directions (two to four is fine) that differ on
+**idea** axes (idea, brand↔product model, mood, signature idea, market position), **form** axes (corners, edges,
+density, button and status construction, product layout, website composition) and **personality** axes
+(colour mood band, lead type class, tone of voice with sample lines). Unassigned axes converge on one model's
+taste, so assign all three groups. Logos are out of scope: plain text wordmark until the name is final.
+Review the draft with the set table in directions.md, and for generic colours, claims the product can't back,
+and false "only one that…" lines. Then
 show the user and **wait**: they read, pick, edit or ask for another set (e.g. "more enterprise-focused").
 Further rounds continue the lettering (D, E, F…) so earlier proposals stay comparable.
 
 ### 4. Write the brief
 Fill `references/brief-template.md` into `<proposals>/BRIEF.md`. It is a **template, not a recipe**: share the
 outline (sections, states to cover, checks, accessibility floor, page frame) and assign everything that should
-differ (colour, type, **form profile**, product-screen layout idea, website composition, sample data). Describe
+differ (**form profile**, **personality**: colour mood, type class, tone; product-screen layout idea, website
+composition, sample data, how each is unlike the competitors). Fix status colours here if the user chose that. Describe
 the composites as jobs, not screens. When rules change mid-way (new standard, user feedback), update the brief
 and tell any running builders.
 
@@ -62,13 +74,26 @@ As each finishes, follow `references/review.md`: serve the folder (`python3 -m h
 proposals' parent), run `scripts/check-pages.mjs` yourself, look at the screenshots, and fix layout faults
 (the table of known pitfalls saves time). When all are in, run `scripts/sameness.mjs` and look at its contact
 sheets; if proposals differ only in paint, rebuild the worst pair with stronger form assignments before
-presenting. Then build `<proposals>/index.html` from `assets/compare-index.html`
+presenting. Also check personality: a table of each proposal's ground colour band, lead type class and
+headline, set beside the competitor contact sheet. Clusters there are as real as clusters in form. Then build `<proposals>/index.html` from `assets/compare-index.html`
 with screenshots in `_shots/`, open it in the browser panel, and summarise each proposal in plain words: what it
 looks like, the one standout idea, the decisions the user must weigh.
 
 Leave "How to judge them" for the owner. Criteria are their call, and good ones make at least one proposal lose.
 
-### 7. After a choice
+### 7. Stress-test the shortlist (before choosing one)
+Proposals are built around the screens that sell the product, so they all look good there. Once the user
+shortlists two or three (ideally after settling positioning), send each back to a builder to add the screens
+nobody designed, in the same system, then compare again:
+- the screen an end user meets when the product acts on them (e.g. a block or challenge page, an error page,
+  an email); this is often where accessibility law bites hardest (WCAG 2.2 3.3.8: no puzzle tests);
+- setup and onboarding (the first run, connecting the product, switching from trial or shadow to live);
+- a second product area (e.g. analytics with filters and top lists, or settings with roles and permissions);
+- dark mode (if not built) and the main screen at phone width;
+- an accessibility statement and a versioning and deprecation note.
+The system that holds up on these is usually the one to choose.
+
+### 8. After a choice
 - Make the winner's `tokens.json` the project's single source; generate CSS variables from it (Style
   Dictionary, or the builder's script moved into the repo). Add a check for raw colours outside it.
 - Fill the gaps the standards flag: an APG pattern per component, an accessibility statement, a versioning
@@ -90,6 +115,12 @@ Leave "How to judge them" for the owner. Criteria are their call, and good ones 
 - Proposals that differ only in paint. The first real run produced nine proposals with the same corners,
   borders, control sizes, button pair, dashboard layout and hero. Assign form as well as colour, describe jobs
   not screens, give each its own sample data, never show a builder another proposal, and run `sameness.mjs`.
+- Proposals that differ in form but share a personality. The second run fixed form, yet six of nine sat on light
+  grey grounds, eight of nine led with a grotesque sans, seven of nine had the same status colours, and all
+  wrote in one voice. Assign colour mood, type class and tone; decide status colours explicitly.
+- Differentiating only within the set. Without a competitor audit, nobody knows whether the whole set looks like
+  the market leader.
+- Judging on hero screens. Shortlist, then stress-test on the unglamorous screens (step 7).
 - Uneven depth between proposals (one shows brand vs product as a diagram, another as a sentence): fine if the
   user accepts it, but say so when comparing.
 - Builder reports are optimistic: check pages yourself and recompute contrast and colour-blind numbers with the

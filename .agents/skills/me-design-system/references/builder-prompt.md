@@ -18,18 +18,24 @@ Build design-system proposal **{{X}}. {{Name}}** for {{Product}}.
 
 ## Your direction (the user approved this description)
 {{paste the approved description, including the form profile, product layout idea, website composition,
+personality (colour mood band and ground, lead type class and families, tone with its three sample lines),
 sample data set, and any changes the user or you asked for}}
 
+Status colours: {{fixed by the brief: use these hex values | yours to design}}. Logo: a plain text wordmark (the
+name in your lead face); don't draw a mark.
+
 ## The others, and what to stay away from
-{{one line per other direction: its colour/type AND its form profile, e.g. "E: cool blue-grey, Schibsted;
-small corners, hairlines, sidebar + content, map hero"}}
+{{one line per other direction: its form profile AND its personality, e.g. "E: small corners, hairlines,
+sidebar + content, map hero; light tinted blue-grey, grotesque sans, cartographer's tone"}}
+Competitors buyers already know: {{one line each from the brief's market table}}. Look unlike them too.
 
 ## Process
 1. Design plan first: palette with named hex values, type roles and scale, your form profile as numbers,
    product-screen layout sketch (ASCII is fine), website composition sketch, and for each item in "Defaults to
    replace" one line on what you chose instead.
-2. Check the plan against the others' form profiles: if you share more than two form choices with any of them,
-   change yours.
+2. Check the plan against the others: if you share more than two form choices with any of them, or your colour
+   mood band or lead type class drifted from the assignment, change yours. Write the website's headline, one
+   error and one status message in your tone before building; if they could belong to another proposal, rewrite.
 3. Build. Spend boldness in one place, but let the form profile show on every component.
 
 ## Files

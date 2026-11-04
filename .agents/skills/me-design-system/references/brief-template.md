@@ -7,7 +7,10 @@ proposal must cover) so proposals can be compared. It must not fix the *content*
 which button construction, which sample rows). When the first Bot Max round fixed both, nine proposals came out
 as one product in nine paints: same near-square corners, same 28/40 px controls, same filled-plus-outlined
 buttons, same dashboard layout, same left-aligned hero with two buttons. Differences survived only where a
-direction had to invent its own component. So: share the outline, assign the form, describe jobs not screens.
+direction had to invent its own component. A second round that assigned form still clustered in personality
+(light grey grounds, grotesque sans, same status colours, same voice). So: share the outline, assign the form
+**and** the personality (colour mood, type class, tone), decide status colours on purpose, describe jobs not
+screens.
 
 ---
 
@@ -23,7 +26,16 @@ Written {{date}} for {{owner}}. Not adopted; proposals to compare.
   format and zone, **one currency and number format for all sample data**, tabular figures, minimum readable
   table text, languages, claims the product can't make}}
 - Fixed status set, same order everywhere, one colour each + a non-colour cue: {{e.g. Human, Bot, Agent, Unsure}}
-- The name is {{final / a working name}}. Name and logo live in one swappable token group (`brand.*`) and one mark.
+- **Status colours: {{fixed | varied}}.** {{If fixed: the hex values every direction uses, and where they came
+  from (the current product, or chosen once with the owner). If varied: each direction designs its own and the
+  review compares them.}}
+- The name is {{final / a working name}}. Name and logo live in one swappable token group (`brand.*`). Until the
+  name is final, every direction uses a **plain text wordmark** (the name in its lead face), no invented mark.
+
+## The market (from the competitor audit)
+{{A short table of 6–8 competitors: ground colour and mood band, lead type class, form (corners, edges), tone,
+and one line on what buyers will recognise them by. Link the audit file and its contact sheet.}} Each direction
+must look unlike these, and say how in one line.
 
 ## Shared on purpose vs must differ
 | Shared by every proposal (for comparison and correctness) | Must differ between proposals (assigned below) |
@@ -34,6 +46,8 @@ Written {{date}} for {{owner}}. Not adopted; proposals to compare.
 | Status words and their meaning | Layout grid and composition of the product screen |
 | Sample-data safety rules | Website composition |
 | Files and checks | Sample data set and example copy |
+| Status colours, if the brief fixes them | Colour mood band, lead type class, tone of voice |
+| The placeholder wordmark rule | How each looks unlike the competitors |
 
 ## The directions (assigned; don't drift into each other)
 | | {{A. Name}} | {{B. Name}} | {{C. Name}} |
@@ -41,8 +55,11 @@ Written {{date}} for {{owner}}. Not adopted; proposals to compare.
 | Idea it carries | | | |
 | Brand ↔ product model | one unified / one foundation, two expressions / separate systems | | |
 | Feeling | | | |
-| Type (assigned) | | | |
+| Colour mood band + ground hex | | | |
 | Colour strategy | | | |
+| Lead type class + families | | | |
+| Tone of voice + three sample lines | | | |
+| Unlike competitors because | | | |
 | **Form profile** (see below) | | | |
 | Product screen: the job and its layout idea | | | |
 | Website: composition idea | | | |
@@ -62,8 +79,10 @@ Written {{date}} for {{owner}}. Not adopted; proposals to compare.
 1. **Thesis**: two sentences; which idea; which brand↔product model and why; what is shared and what differs
    between brand and product (a small diagram beats a sentence).
 2. **Principles**: 3–6, each "so we do / so we don't" + a concrete product example.
-3. **Voice and words**: 3 voice traits; status labels with one-line definitions; button label rules; one error,
-   one empty state, one domain-specific explanation, one marketing headline + subline. Customer words only.
+3. **Voice and words**: your assigned tone, with 3 traits; status labels with one-line definitions; button label
+   rules; one error, one empty state, one domain-specific explanation, one marketing headline + subline. The exact
+   status words and the claims we can't make are fixed by this brief; how you say everything else is your tone,
+   and the website copy must sound like it, not like the other proposals. Customer words only.
 4. **Foundations / tokens**: palette; semantic roles; type scale; spacing; the form profile as tokens (radius,
    border widths, elevation, control and row heights); motion; icon rule. **Contrast table** from the skill's
    `scripts/contrast.mjs`: every text/surface pair and status colour vs 4.5:1 (text) or 3:1 (non-text). No failure.
@@ -109,4 +128,6 @@ Cream + terracotta; black + one acid accent; broadsheet hairline grids; identica
 and gradient washes; ALL-CAPS tracked eyebrows; "A · B · C" meta strings; "→" on every button; 01/02/03 on
 non-sequences; one italic accented word; sci-fi HUD glow; **and the developer-tool default**: near-square corners,
 1 px grey borders, a dark filled primary next to an outlined secondary, left-aligned hero with two buttons,
-dashboard = filter row + KPI tiles + stacked bars + table + right panel.
+dashboard = filter row + KPI tiles + stacked bars + table + right panel; **and the calm-analytics default**: a
+light cool-grey ground, a neutral grotesque sans, blue/red/purple/grey status colours, and polite explainer copy
+("X sits in front of your site…"). Use it only if your row in the table assigns it.
