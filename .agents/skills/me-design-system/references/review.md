@@ -7,6 +7,14 @@
   that looks like an IP, email or long id).
 - Read the README for claims the product can't back (compliance, certification, measured money).
 
+## Sameness (check before the user sees anything)
+Run `node scripts/sameness.mjs <proposals> --base http://127.0.0.1:8765/<proposals-path> --out <proposals>/_shots`.
+It prints each proposal's form values (corners, borders, control and row heights), flags pairs alike on 3+ of 4,
+and writes contact sheets of every Components and Composites section side by side. Look at the sheets: numbers
+miss layout and construction (same dashboard layout, same hero, same button pair). If proposals read as one
+product in different colours, fix the brief and rebuild the worst pair before presenting; don't present a set
+that only differs in paint.
+
 ## Known pitfalls (each one happened at least once)
 | Symptom | Cause | Fix |
 |---|---|---|
@@ -18,6 +26,14 @@
 | Build script lost | Scripts were left in /tmp | Keep them in `<slug>/_build/` |
 | Browser-panel screenshots don't follow `#hash` navigation | The panel captures the visible top of the page | Use `check-pages.mjs` (headless Chrome) for scrolled shots |
 | Builder subagent fails at once ("model unavailable") | Default model alias not available | Relaunch with an explicit model ID from the models tool |
+| All proposals look like one product in different colours | Brief fixed the screens (recipe) and only assigned surface axes; ban lists pushed everyone into the same corner; shared sample rows; builders shown another proposal | Assign form profiles and layout ideas per direction, describe composites as jobs, give each its own sample data, show builders only the page frame, run `sameness.mjs` |
+| A check reads the wrong current section | Smooth scrolling still running when read | `check-pages.mjs` emulates reduced motion |
+| Colours render black or a size reads "[object Object]" | A semantic token aliases a primitive with the same CSS name, so the variable points to itself; or a DTCG dimension object was printed raw | Name primitives by hue/step, semantics by role; have the build refuse self-references and unformatted values |
+| Hidden pages, panels or slides all show at once | An author `display` rule overrides the `hidden` attribute | Add `[hidden] { display: none !important; }` |
+| Commas and colons look spaced out in prose | Tabular figures (`tnum`) applied to body text | Apply `tnum` only where numbers line up (tables, figures) |
+| A builder keeps colours that fail colour-blindness | The prompt said both "keep these colours" and "must pass" | Say which wins: adjust lightness first, keep hue, report before/after |
+| Sameness flags pairs that clearly look different | Shared floors (24 px targets) counted as form choices | The script skips `target`/`min` tokens; always judge from the contact sheets |
+| A builder's colour-blind "pass" disagrees with yours | Different metric (OKLab distance vs ΔE) | Re-run `contrast.mjs --cvd` and report that number |
 
 ## Comparison page
 Build `<proposals>/index.html` from `assets/compare-index.html`: a side-by-side table (idea, model, feel,

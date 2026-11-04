@@ -35,17 +35,18 @@ source it cites and mark anything it couldn't open.
 
 ### 3. Propose directions as descriptions first
 Follow `references/directions.md`. A subagent drafts three directions (two to four is fine) that differ on
-several axes at once: idea, brand↔product model, mood, theme, density, type, colour strategy, signature idea.
+surface axes (idea, brand↔product model, mood, theme, type, colour, signature idea) **and form axes** (corners,
+edges, density, button and status construction, product layout, website composition).
 Review the draft for generic colours, claims the product can't back, and false "only one that…" lines. Then
 show the user and **wait**: they read, pick, edit or ask for another set (e.g. "more enterprise-focused").
 Further rounds continue the lettering (D, E, F…) so earlier proposals stay comparable.
 
 ### 4. Write the brief
-Fill `references/brief-template.md` into `<proposals>/BRIEF.md`: product truths, the direction table with
-assigned type and "must not become", the eight-section skeleton, files, page frame, sample-data rules,
-generic looks to avoid. The brief is what makes proposals comparable, so put every shared rule here, not in
-individual prompts. When rules change mid-way (new standard, user feedback), update the brief and tell any
-running builders.
+Fill `references/brief-template.md` into `<proposals>/BRIEF.md`. It is a **template, not a recipe**: share the
+outline (sections, states to cover, checks, accessibility floor, page frame) and assign everything that should
+differ (colour, type, **form profile**, product-screen layout idea, website composition, sample data). Describe
+the composites as jobs, not screens. When rules change mid-way (new standard, user feedback), update the brief
+and tell any running builders.
 
 ### 5. Build in parallel
 One builder subagent per approved direction, all launched in the same turn, in the background, using
@@ -59,7 +60,9 @@ While they run, keep the user informed briefly. Don't duplicate a builder's work
 ### 6. Review, fix, compare
 As each finishes, follow `references/review.md`: serve the folder (`python3 -m http.server 8765` from the
 proposals' parent), run `scripts/check-pages.mjs` yourself, look at the screenshots, and fix layout faults
-(the table of known pitfalls saves time). Then build `<proposals>/index.html` from `assets/compare-index.html`
+(the table of known pitfalls saves time). When all are in, run `scripts/sameness.mjs` and look at its contact
+sheets; if proposals differ only in paint, rebuild the worst pair with stronger form assignments before
+presenting. Then build `<proposals>/index.html` from `assets/compare-index.html`
 with screenshots in `_shots/`, open it in the browser panel, and summarise each proposal in plain words: what it
 looks like, the one standout idea, the decisions the user must weigh.
 
@@ -73,8 +76,20 @@ Leave "How to judge them" for the owner. Criteria are their call, and good ones 
 - Extract components from real screens, not from the proposal page. Record ownership (look and voice vs code).
 - Optional: product demos and marketing visuals with the `stageshow` skill, driven only by the system's tokens.
 
+### Committing the proposals (only when the user says so)
+- Follow the repo's own commit rules (branch or straight to main, message style); if they clash with the
+  user's general rules, say which you follow before committing.
+- Add a `.gitignore` in the design-system folder for `proposals/*/_build/shots/` and `.DS_Store`: the working
+  screenshots are large (≈40 MB for nine proposals) and `check-pages.mjs` regenerates them.
+- Before staging, scan for anything sensitive in sample data (IP-like numbers, emails, long hex ids, keys). Copied
+  third-party kits trip the scan harmlessly; check the hits, don't just count them.
+- Stage only the design-system folder, check the staged list, and confirm afterwards that the push changed
+  nothing outside it.
+
 ## Things that keep going wrong
-- Proposals that differ only in hue: assign type, model and "must not become" per direction up front.
+- Proposals that differ only in paint. The first real run produced nine proposals with the same corners,
+  borders, control sizes, button pair, dashboard layout and hero. Assign form as well as colour, describe jobs
+  not screens, give each its own sample data, never show a builder another proposal, and run `sameness.mjs`.
 - Uneven depth between proposals (one shows brand vs product as a diagram, another as a sentence): fine if the
   user accepts it, but say so when comparing.
 - Builder reports are optimistic: check pages yourself and recompute contrast and colour-blind numbers with the

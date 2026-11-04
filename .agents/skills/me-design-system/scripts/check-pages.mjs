@@ -37,7 +37,8 @@ let problems = 0;
 for (const url of urls) {
   const slug = new URL(url).pathname.split('/').filter(Boolean).slice(-2, -1)[0] || 'page';
   for (const w of widths) {
-    const page = await browser.newPage({ viewport: { width: w, height: w > 800 ? 900 : 844 } });
+    // Reduced motion: smooth scrolling would otherwise still be running when the list is read.
+    const page = await browser.newPage({ viewport: { width: w, height: w > 800 ? 900 : 844 }, reducedMotion: 'reduce' });
     const errors = [];
     page.on('pageerror', e => errors.push(e.message));
     await page.goto(url, { waitUntil: 'networkidle' });
