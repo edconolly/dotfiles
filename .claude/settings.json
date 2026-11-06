@@ -15,10 +15,12 @@
     }
   },
   "outputStyle": "Learning",
+  "feedbackDrafts": "notify",
   "advisorModel": "fable",
   "tui": "fullscreen",
   "skipWorkflowUsageWarning": true,
   "theme": "dark",
+  "editorMode": "normal",
   "switchModelsOnFlag": false,
   "inputNeededNotifEnabled": true,
   "agentPushNotifEnabled": true
