@@ -5,76 +5,121 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{Product}} design system: proposals compared</title>
 <!--
-  Comparison page template (me-design-system skill). Fill {{…}}; add one <td> per proposal in each row and one
-  <section class="col"> per proposal. Deliberately plain styling so it doesn't favour any proposal.
-  Swatches: <span class="sw"><i style="background:#HEX"></i>…</span>
+  Comparison page template (me-design-system skill): <proposals>/index.html. Fill {{…}} and delete what's unused.
+  Order is fixed, most important first: product before/after, brand directions side by side, each proposal in full,
+  how to judge. Deliberately plain styling (system font, greys) so it favours no proposal.
+
+  How to fill it:
+  - One .row per screen id in screens.json: product-layer screens (layer product or both) go under "Product layer",
+    brand-layer screens (layer brand or both) under "Brand directions". Same order as screens.json.
+  - Each .row holds one .win per column; columns share the width equally (two for before/after, one per direction
+    for brand rows) and stack under 900 px. Window frames are drawn here: never screenshot a browser frame.
+  - Images: reference <slug>/_build/shots/<id>-1440.png directly, or copy them to _shots/<slug>-<id>-1440.png.
+    The "before" is references/before/<id>-1440.png. Each shot is cropped to the first screen; the image and the
+    "See it all" link open the full page (the live screen file for proposals, the PNG for "before").
+  - "What changed": one plain line per product row, about what a person sees, not tokens.
 -->
 <style>
-  :root { --ink:#1d1d1f; --muted:#5b5b60; --line:#d6d6db; --soft:#f5f5f7; }
+  :root { --ink: #1d1d1f; --muted: #5b5b60; --line: #d6d6db; --soft: #f5f5f7; }
   * { box-sizing: border-box; }
-  body { margin: 0; font: 16px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--ink); background: #fff; }
-  main { max-width: 1320px; margin: 0 auto; padding: 48px 24px 96px; }
-  h1 { font-size: 34px; line-height: 1.15; margin: 0 0 12px; }
-  h2 { font-size: 22px; margin: 56px 0 12px; }
-  h3 { font-size: 18px; margin: 0 0 6px; }
-  p { max-width: 72ch; }
+  body { margin: 0; font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--ink); background: #fff; }
+  main { max-width: 1600px; margin: 0 auto; padding: 40px 32px 96px; }
+  h1 { font-size: 32px; line-height: 1.15; margin: 0 0 10px; }
+  h2 { font-size: 24px; line-height: 1.25; margin: 64px 0 6px; padding-top: 24px; border-top: 1px solid var(--line); }
+  h3 { font-size: 17px; line-height: 1.3; margin: 32px 0 12px; }
+  p { max-width: 75ch; margin: 0 0 12px; }
   .muted { color: var(--muted); }
-  a { color: inherit; }
+  a { color: inherit; text-underline-offset: 2px; }
   a:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
-  .table-wrap { overflow-x: auto; }
-  table { border-collapse: collapse; width: 100%; min-width: 760px; font-size: 14px; }
-  th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
-  thead th { background: var(--soft); font-weight: 600; }
-  tbody th { font-weight: 600; width: 14%; }
-  .sw { display: inline-flex; gap: 4px; vertical-align: middle; }
-  .sw i { width: 18px; height: 18px; border-radius: 3px; border: 1px solid rgba(0,0,0,.15); display: inline-block; }
-  .cols { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; margin-top: 16px; }
-  .col img { width: 100%; height: auto; border: 1px solid var(--line); border-radius: 6px; display: block; }
-  .col .shot { max-height: 760px; overflow: hidden; border-radius: 6px; }
-  .col ul { padding-left: 18px; margin: 8px 0 0; font-size: 15px; }
-  .open { display: inline-block; margin: 10px 0 14px; font-weight: 600; }
+  /* A row: equal columns, side by side; stacked on narrow screens. */
+  .row { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 24px; align-items: start; }
+  .col-label { font-size: 14px; font-weight: 600; margin: 0 0 6px; }
+  .col-label span { font-weight: 400; color: var(--muted); }
+  /* Plain browser-window frame around each screenshot. */
+  .win { margin: 0; min-width: 0; }
+  .win-frame { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: #fff; }
+  .win-bar { display: flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; background: var(--soft); border-bottom: 1px solid var(--line); font-size: 12px; color: var(--muted); }
+  .win-bar i { flex: none; width: 9px; height: 9px; border-radius: 50%; background: #c7c7cc; }
+  .win-bar span { margin-left: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .win-shot { display: block; aspect-ratio: 1440 / 900; background: var(--soft); }
+  .win-shot img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+  .win figcaption { font-size: 14px; margin-top: 6px; }
+  .win figcaption a { display: inline-flex; align-items: center; min-height: 24px; }
+  .changed { margin: 10px 0 0; font-size: 15px; }
+  /* Each proposal in full. */
+  .props { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 24px; margin-top: 16px; }
+  .prop { border: 1px solid var(--line); border-radius: 8px; padding: 20px; }
+  .prop h3 { margin: 0 0 6px; }
+  .prop ul { margin: 4px 0 12px; padding-left: 20px; font-size: 15px; }
+  .prop .links { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 8px 0 12px; font-size: 15px; }
+  .prop .links a { display: inline-flex; align-items: center; min-height: 24px; }
+  .prop h4 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 12px 0 0; }
+  @media (max-width: 900px) {
+    main { padding: 28px 16px 64px; }
+    h1 { font-size: 26px; }
+    .row { grid-auto-flow: row; gap: 20px; }
+  }
 </style>
 </head>
 <body>
 <main>
   <h1>{{Product}} design system: {{N}} proposals</h1>
-  <p class="muted">For {{owner}}, {{date}}. Each proposal is a whole system (principles, voice, tokens, components with states, chart rules, sample screens, ownership) built from the same <a href="BRIEF.md">brief</a>. They differ in decisions, not only colour. Nothing here is adopted.</p>
+  <p class="muted">For {{owner}}, {{date}}. Built from the same <a href="BRIEF.md">brief</a>, the same screens and the same data; only the design differs. Nothing here is adopted.</p>
 
-  <h2>Side by side</h2>
-  <div class="table-wrap">
-  <table>
-    <thead><tr><th></th><th>{{A. Name}}</th><th>{{B. Name}}</th></tr></thead>
-    <tbody>
-      <tr><th>Idea it carries</th><td></td><td></td></tr>
-      <tr><th>Brand vs product</th><td></td><td></td></tr>
-      <tr><th>Feel</th><td></td><td></td></tr>
-      <tr><th>Colour mood · type class · tone</th><td></td><td></td></tr>
-      <tr><th>Unlike competitors because</th><td></td><td></td></tr>
-      <tr><th>Core colours</th><td></td><td></td></tr>
-      <tr><th>Status colours</th><td></td><td></td></tr>
-      <tr><th>Type</th><td></td><td></td></tr>
-      <tr><th>Density</th><td></td><td></td></tr>
-      <tr><th>Signature idea</th><td></td><td></td></tr>
-      <tr><th>Dark theme</th><td></td><td></td></tr>
-      <tr><th>Biggest risk</th><td></td><td></td></tr>
-    </tbody>
-  </table>
+  <h2 id="product">Product layer: before and after</h2>
+  <p class="muted">Left: the product as it is today. Right: proposal {{P}}, {{P name}}. Same screen, same data, same width.</p>
+
+  <h3>{{Screen title}}</h3>
+  <div class="row">
+    <figure class="win">
+      <p class="col-label">Before <span>· today's product</span></p>
+      <div class="win-frame">
+        <div class="win-bar"><i></i><i></i><i></i><span>{{Screen title}}</span></div>
+        <a class="win-shot" href="references/before/{{id}}-1440.png"><img src="references/before/{{id}}-1440.png" alt="{{Screen title}}, today's product" loading="lazy"></a>
+      </div>
+      <figcaption><a href="references/before/{{id}}-1440.png">See it all</a></figcaption>
+    </figure>
+    <figure class="win">
+      <p class="col-label">After <span>· {{P}}. {{P name}}</span></p>
+      <div class="win-frame">
+        <div class="win-bar"><i></i><i></i><i></i><span>{{Screen title}}</span></div>
+        <a class="win-shot" href="{{p-slug}}/screens/{{id}}.html"><img src="{{p-slug}}/_build/shots/{{id}}-1440.png" alt="{{Screen title}}, proposal {{P}}" loading="lazy"></a>
+      </div>
+      <figcaption><a href="{{p-slug}}/screens/{{id}}.html">See it all</a></figcaption>
+    </figure>
+  </div>
+  <p class="changed"><strong>What changed:</strong> {{one line a person would notice, e.g. "verdicts read as words first, colour second"}}</p>
+
+  <h2 id="brand">Brand directions: the same screen, side by side</h2>
+  <p class="muted">Each direction designs the same screens with the same words and data.</p>
+
+  <h3>{{Screen title, e.g. Website home}}</h3>
+  <div class="row">
+    <figure class="win">
+      <p class="col-label">{{A}}. {{A name}}</p>
+      <div class="win-frame">
+        <div class="win-bar"><i></i><i></i><i></i><span>{{Screen title}}</span></div>
+        <a class="win-shot" href="{{a-slug}}/screens/{{id}}.html"><img src="{{a-slug}}/_build/shots/{{id}}-1440.png" alt="{{Screen title}}, direction {{A}}" loading="lazy"></a>
+      </div>
+      <figcaption><a href="{{a-slug}}/screens/{{id}}.html">See it all</a></figcaption>
+    </figure>
+    <!-- one .win per direction: {{b-slug}}, {{c-slug}} -->
   </div>
 
-  <h2>What each looks like</h2>
-  <div class="cols">
-    <section class="col">
-      <h3>{{A. Name}}</h3>
-      <a class="open" href="{{a-slug}}/index.html">Open proposal {{A}}</a>
-      <div class="shot"><img src="_shots/{{a-slug}}-composites.jpg" alt="{{what the screenshot shows}}"></div>
+  <h2 id="proposals">Each proposal in full</h2>
+  <div class="props">
+    <section class="prop">
+      <h3>{{X}}. {{Name}}</h3>
+      <p>{{One sentence: the idea it carries.}}</p>
+      <p class="links"><a href="{{slug}}/screens/{{id}}.html">{{Screen title}}</a> <a href="{{slug}}/system.html">System sheet</a> <a href="{{slug}}/README.md">README</a></p>
+      <h4>Strengths</h4>
       <ul><li>{{strength}}</li><li>{{strength}}</li></ul>
+      <h4>Biggest risk</h4>
+      <ul><li>{{risk}}</li></ul>
     </section>
   </div>
 
-  <h2>Shared across all</h2>
-  <ul><li>{{fixed rules from the brief}}</li></ul>
-
-  <h2>How to judge them</h2>
+  <h2 id="judge">How to judge them</h2>
   <ul><li>{{criteria the owner chose; each should make at least one proposal lose}}</li></ul>
 </main>
 </body>

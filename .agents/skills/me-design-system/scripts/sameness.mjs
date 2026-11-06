@@ -1,24 +1,32 @@
 #!/usr/bin/env node
-// Sameness check for a set of design-system proposals (me-design-system skill).
+// Sameness check for the brand directions of a design-system proposal set (me-design-system skill, v3).
 //
-//   node sameness.mjs <proposals-dir> [--base http://127.0.0.1:8765/proposals] [--out <dir>]
+//   node sameness.mjs <proposals-dir> [--base http://127.0.0.1:8765/proposals] [--out <dir>] [--strict]
 //
-// 1) Reads every <proposals-dir>/*/tokens.json and pulls the form values: corner radii, border widths, control
-//    heights, row heights. Prints a table and flags pairs of proposals whose form values are nearly the same
+// Only brand directions are compared (folders named like a-signal, b-...). Product-layer proposals (p-...) are
+// meant to share form, so they are left out.
+// 1) Reads every brand direction's tokens.json and pulls the form values: corner radii, border widths, control
+//    heights, row heights. Prints a table and warns about pairs whose form values are nearly the same
 //    (same corner band, same edge band, controls within 4 px, rows within 4 px).
-// 2) With --base, renders each proposal (served over http) and writes two contact sheets to --out:
-//    sameness-components.png and sameness-composites.png, so a person can see sameness at a glance.
-// Exits 1 if any pair is flagged. Look at the sheets either way: numbers miss layout and construction.
+// 2) With --base, reads <proposals-dir>/screens.json and, for each screen whose layer is brand or both, renders
+//    <slug>/screens/<id>.html from every brand direction at 1440 wide (top 1100 px) and writes one contact
+//    sheet per screen to --out (default <proposals-dir>/_shots): sameness-<id>.png, labelled with the slugs.
+// Similar pairs are a warning; exits 1 for them only with --strict. Exit 2 on a usage error.
+// Look at the sheets either way: numbers miss layout and construction.
 
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 
 const args = process.argv.slice(2);
-const dir = args.find(a => !a.startsWith('--') && !['--base', '--out'].includes(args[args.indexOf(a) - 1]));
-if (!dir) { console.error('Usage: sameness.mjs <proposals-dir> [--base url] [--out dir]'); process.exit(2); }
+const dir = args.find((a, i) => !a.startsWith('--') && !['--base', '--out'].includes(args[i - 1]));
+if (!dir) { console.error('Usage: sameness.mjs <proposals-dir> [--base url] [--out dir] [--strict]'); process.exit(2); }
 const opt = k => (args.includes(k) ? args[args.indexOf(k) + 1] : null);
-const base = opt('--base'), out = opt('--out') || dir;
+const base = opt('--base'), out = opt('--out') || path.join(dir, '_shots');
+const strict = args.includes('--strict');
+// Brand directions: a letter and a dash, but not the product layer's p-.
+const brandSlugs = fs.readdirSync(dir, { withFileTypes: true })
+  .filter(d => d.isDirectory() && /^[a-z]-/.test(d.name) && !d.name.startsWith('p-')).map(d => d.name).sort();
 
 function* walk(o, p = '') {
   if (!o || typeof o !== 'object') return;
@@ -35,7 +43,7 @@ const median = a => (a.length ? a[Math.floor((a.length - 1) / 2)] : null);
 const band = r => (r == null ? '?' : r === 0 ? 'sharp' : r <= 6 ? 'small' : r <= 16 ? 'soft' : 'round');
 
 const rows = [];
-for (const slug of fs.readdirSync(dir).sort()) {
+for (const slug of brandSlugs) {
   const f = path.join(dir, slug, 'tokens.json');
   if (!fs.existsSync(f)) continue;
   const toks = [...walk(JSON.parse(fs.readFileSync(f, 'utf8')))];
@@ -61,43 +69,60 @@ for (let i = 0; i < rows.length; i++) for (let j = i + 1; j < rows.length; j++) 
     a.r != null && b.r != null && Math.abs(a.r - b.r) <= 4].filter(Boolean).length;
   if (same >= 3) flagged.push(`${a.slug} ~ ${b.slug} (${same}/4 form values alike)`);
 }
-console.log(flagged.length ? `\nToo alike in form:\n- ${flagged.join('\n- ')}` : '\nNo pair is alike on 3 or more form values.');
+if (!rows.length) console.log('| (no brand direction has a tokens.json yet) | | | | | | |');
+console.log(flagged.length ? `\nWarning, too alike in form:\n- ${flagged.join('\n- ')}` : '\nNo pair is alike on 3 or more form values.');
+const exitCode = strict && flagged.length ? 1 : 0;
 
 if (base) {
-  const home = os.homedir();
-  let chromium;
-  for (const c of [process.env.PLAYWRIGHT_CORE, 'playwright-core', path.join(home, '.dotfiles/.agents/skills/stageshow/node_modules/playwright-core/index.mjs')].filter(Boolean)) {
-    try { ({ chromium } = await import(c)); break; } catch {}
-  }
-  if (!chromium) { console.error('playwright-core not found; skipping contact sheets'); process.exit(flagged.length ? 1 : 0); }
-  const chromePath = process.env.CHROME_PATH || ['/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', '/usr/bin/google-chrome', '/usr/bin/chromium'].find(p => fs.existsSync(p));
-  const browser = await chromium.launch(chromePath ? { executablePath: chromePath } : {});
-  const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'sameness-'));
-  const shot = {};
-  for (const { slug } of rows) {
-    await page.goto(`${base.replace(/\/$/, '')}/${slug}/index.html`, { waitUntil: 'networkidle' });
-    for (const label of ['Components', 'Composites']) {
-      const y = await page.evaluate(l => {
-        const a = [...document.querySelectorAll('.toc a')].find(x => x.textContent.includes(l));
-        let el = (a && document.querySelector(a.hash)) || document.getElementById(l.toLowerCase());
-        if (!el) return null; el = el.closest('section') || el; return el.getBoundingClientRect().top + scrollY;
-      }, label);
-      if (y == null) continue;
-      const file = path.join(tmp, `${slug}-${label}.png`);
-      await page.screenshot({ path: file, fullPage: true, clip: { x: 200, y, width: 1240, height: 900 } });
-      (shot[label] ||= []).push([slug, file]);
+  const specFile = path.join(dir, 'screens.json');
+  const spec = fs.existsSync(specFile) ? JSON.parse(fs.readFileSync(specFile, 'utf8')) : null;
+  const brandScreens = (spec?.screens || []).filter(s => s.layer === 'brand' || s.layer === 'both');
+  if (!spec) console.log(`\nNo screens.json in ${dir}; skipping contact sheets.`);
+  else if (!brandScreens.length) console.log('\nscreens.json has no brand or both screens; skipping contact sheets.');
+  else if (brandSlugs.length < 2) console.log('\nFewer than two brand directions; skipping contact sheets.');
+  else {
+    const home = os.homedir();
+    let chromium;
+    for (const c of [process.env.PLAYWRIGHT_CORE, 'playwright-core', path.join(home, '.dotfiles/.agents/skills/stageshow/node_modules/playwright-core/index.mjs')].filter(Boolean)) {
+      try { ({ chromium } = await import(c)); break; } catch {}
     }
+    if (!chromium) { console.error('playwright-core not found; skipping contact sheets'); process.exit(exitCode); }
+    const chromePath = process.env.CHROME_PATH || ['/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', '/usr/bin/google-chrome', '/usr/bin/chromium'].find(p => fs.existsSync(p));
+    const browser = await chromium.launch(chromePath ? { executablePath: chromePath } : {});
+    // The top 1100 px of each screen at 1440 wide is the viewport itself, so a plain viewport screenshot.
+    const page = await browser.newPage({ viewport: { width: 1440, height: 1100 }, reducedMotion: 'reduce' });
+    fs.mkdirSync(out, { recursive: true });
+    const COL = 720, PER_ROW = Math.min(3, brandSlugs.length), GAP = 12;
+    const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+    for (const s of brandScreens) {
+      if (!brandSlugs.some(slug => fs.existsSync(path.join(dir, slug, 'screens', `${s.id}.html`)))) {
+        console.log(`No brand direction has screens/${s.id}.html yet; no sheet for it.`); continue;
+      }
+      const cells = [];
+      for (const slug of brandSlugs) {
+        if (!fs.existsSync(path.join(dir, slug, 'screens', `${s.id}.html`))) { cells.push([slug, null, 'missing']); continue; }
+        try {
+          await page.goto(`${base.replace(/\/$/, '')}/${slug}/screens/${s.id}.html`, { waitUntil: 'networkidle', timeout: 30000 });
+          await page.evaluate(() => document.fonts.ready);
+          await page.waitForTimeout(200);
+          cells.push([slug, `data:image/png;base64,${(await page.screenshot()).toString('base64')}`, '']);
+        } catch (e) { cells.push([slug, null, `render failed: ${e.message.split('\n')[0]}`]); }
+      }
+      const sheetW = PER_ROW * COL + (PER_ROW + 1) * GAP;
+      const html = `<!doctype html><body style="margin:0;background:#e6e6e8;width:${sheetW}px"><div style="display:grid;grid-template-columns:repeat(${PER_ROW},${COL}px);gap:${GAP}px;padding:${GAP}px;align-items:start">${cells.map(([slug, src, note]) =>
+        `<figure style="margin:0"><figcaption style="font:600 13px/1.4 -apple-system,system-ui,sans-serif;color:#3a3a3c;padding:0 0 6px">${esc(slug)}${note ? ` (${esc(note)})` : ''}</figcaption>${src
+          ? `<img src="${src}" style="display:block;width:${COL}px;box-shadow:0 0 0 1px #c8c8cc">`
+          : `<div style="width:${COL}px;height:${COL * 1100 / 1440}px;background:#f4f4f5;box-shadow:0 0 0 1px #c8c8cc"></div>`}</figure>`).join('')}</div></body>`;
+      const q = await browser.newPage({ viewport: { width: sheetW, height: 400 }, deviceScaleFactor: 1 });
+      await q.setContent(html);
+      const h = await q.evaluate(async () => { await Promise.all([...document.images].map(i => i.decode())); return Math.ceil(document.documentElement.scrollHeight); });
+      const dest = path.join(out, `sameness-${s.id}.png`);
+      // Viewport sized to the sheet (fullPage on setContent pages can repeat the first viewport).
+      await q.setViewportSize({ width: sheetW, height: Math.min(h, 16000) });
+      await q.screenshot({ path: dest }); await q.close();
+      console.log(`Wrote ${dest}${cells.some(c => !c[1]) ? ` (gaps: ${cells.filter(c => !c[1]).map(c => `${c[0]} ${c[2]}`).join(', ')})` : ''}`);
+    }
+    await browser.close();
   }
-  for (const [label, list] of Object.entries(shot)) {
-    const html = `<body style="margin:0;background:#888;display:grid;grid-template-columns:repeat(3,620px);gap:6px;padding:6px;font:14px system-ui">${list.map(([s, f]) => `<figure style="margin:0;background:#fff"><figcaption style="padding:4px 8px;font-weight:600">${s}</figcaption><img src="file://${f}" style="width:620px;display:block"></figure>`).join('')}</body>`;
-    const hf = path.join(tmp, `${label}.html`); fs.writeFileSync(hf, html);
-    const q = await browser.newPage({ viewport: { width: 1884, height: 400 } });
-    await q.goto(`file://${hf}`); await q.waitForTimeout(300);
-    const dest = path.join(out, `sameness-${label.toLowerCase()}.png`);
-    await q.screenshot({ path: dest, fullPage: true }); await q.close();
-    console.log(`Wrote ${dest}`);
-  }
-  await browser.close();
 }
-process.exit(flagged.length ? 1 : 0);
+process.exit(exitCode);

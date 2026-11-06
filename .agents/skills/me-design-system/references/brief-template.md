@@ -2,132 +2,110 @@
 
 Copy into `<proposals>/BRIEF.md` and fill every `{{…}}`. Every builder reads it in full.
 
-**Template, not recipe.** The brief fixes the *outline* (which sections exist, which states and checks every
-proposal must cover) so proposals can be compared. It must not fix the *content* (which screens, which layouts,
-which button construction, which sample rows). When the first Bot Max round fixed both, nine proposals came out
-as one product in nine paints: same near-square corners, same 28/40 px controls, same filled-plus-outlined
-buttons, same dashboard layout, same left-aligned hero with two buttons. Differences survived only where a
-direction had to invent its own component. A second round that assigned form still clustered in personality
-(light grey grounds, grotesque sans, same status colours, same voice). So: share the outline, assign the form
-**and** the personality (colour mood, type class, tone), decide status colours on purpose, describe jobs not
-screens.
+The brief fixes what every proposal shares so they can be compared fairly: the product truths, the screen set,
+the data, the references, the checks. It never fixes how a screen looks. It does not tell builders to ignore the
+current product: where one exists, it is the starting material.
 
 ---
 
-# Brief: design-system proposals for {{Product}}
+# Brief: design system for {{Product}}
 
-Written {{date}} for {{owner}}. Not adopted; proposals to compare.
+Written {{date}} for {{owner}}. Proposals to compare; nothing is adopted.
 
-## The product (what every proposal designs for)
+## The product
 - What it is, in two sentences: {{…}}
-- Who uses it and who buys it: {{…}}
-- Surfaces: {{e.g. a dense dashboard + a public website}}
-- Product truths every proposal must respect (not style): {{status words and exact meanings, units, time
-  format and zone, **one currency and number format for all sample data**, tabular figures, minimum readable
-  table text, languages, claims the product can't make}}
-- Fixed status set, same order everywhere, one colour each + a non-colour cue: {{e.g. Human, Bot, Agent, Unsure}}
-- **Status colours: {{fixed | varied}}.** {{If fixed: the hex values every direction uses, and where they came
-  from (the current product, or chosen once with the owner). If varied: each direction designs its own and the
-  review compares them.}}
-- The name is {{final / a working name}}. Name and logo live in one swappable token group (`brand.*`). Until the
-  name is final, every direction uses a **plain text wordmark** (the name in its lead face), no invented mark.
+- Who uses it daily and who buys it: {{…}}
+- Surfaces: {{e.g. a dense analytics dashboard, a public website, a page end users meet}}
+- Product truths every screen must respect (not style): {{status words and exact meanings in a fixed order; units;
+  time format and zone; one currency and number format; languages; minimum readable table text; claims the
+  product can't make}}
+- Status colours: {{the values the product layer uses, and where they come from (current product, or fixed by
+  the product proposal). Brand directions never change them.}}
+- The name is {{final / a working name}}. Until it is final: a plain text wordmark, no invented mark.
 
-## The market (from the competitor audit)
-{{A short table of 6–8 competitors: ground colour and mood band, lead type class, form (corners, edges), tone,
-and one line on what buyers will recognise them by. Link the audit file and its contact sheet.}} Each direction
-must look unlike these, and say how in one line.
+## What exists
+{{One of: "A running product: <how to run it>. Audit: <research>/audit.md" · "Some screens: <where>" · "Nothing yet."}}
 
-## Shared on purpose vs must differ
-| Shared by every proposal (for comparison and correctness) | Must differ between proposals (assigned below) |
-|---|---|
-| The eight sections and page frame | Colour strategy and palette |
-| Which states each component covers | Type families and scale contrast |
-| Accessibility floor (WCAG 2.2 AA, 24 px targets, APG patterns) | Form profile: corners, edges, depth, density, control and badge construction |
-| Status words and their meaning | Layout grid and composition of the product screen |
-| Sample-data safety rules | Website composition |
-| Files and checks | Sample data set and example copy |
-| Status colours, if the brief fixes them | Colour mood band, lead type class, tone of voice |
-| The placeholder wordmark rule | How each looks unlike the competitors |
+**Keep** (from the audit; things users rely on): {{e.g. the five verdict levels with one colour each in the same
+order everywhere; one sans-serif at small sizes; filters above results; the side panel for one session}}
 
-## The directions (assigned; don't drift into each other)
+**Fix** (from the audit, worst first, each with its screenshot): {{e.g. "High · four of five verdict fills are
+under 3:1 on white (references/audit/explore-1440.png)"}}
+
+## The screen set
+Every proposal renders these screens, with the shared data, as `<slug>/screens/<id>.html`. Static, full size,
+1440 wide; screens marked phone also at 390. Layer says who renders it: the product proposal renders product and
+both; each brand direction renders brand and both.
+
+| id | Screen | Layer | Phone | The job it must do |
+|---|---|---|---|---|
+| {{01-…}} | {{main working screen}} | product | yes | {{e.g. see what happened on your site today}} |
+| {{02-…}} | {{detail view}} | product | no | {{e.g. understand why one visit got its verdict}} |
+| {{03-…}} | {{first-run or empty state}} | product | no | {{…}} |
+| {{04-…}} | {{setup / onboarding}} | product | no | {{…}} |
+| {{05-…}} | {{surface end users meet}} | both | yes | {{…}} |
+| {{06-…}} | {{website home}} | brand | yes | {{e.g. a first-time visitor understands what it does and why to trust it}} |
+
+`screens.json` holds the same list for the scripts:
+```json
+{
+  "widths": [1440, 390],
+  "screens": [
+    { "id": "01-analytics", "title": "Explore, Analytics view", "layer": "product", "phone": true,
+      "before": "http://127.0.0.1:8710/explore?view=analytics" },
+    { "id": "06-home", "title": "Website home", "layer": "brand", "phone": true }
+  ]
+}
+```
+`before` is the existing product's URL for that screen, if there is one.
+
+## The shared data
+`<proposals>/data/sample.json`: {{where it comes from, e.g. the dashboard's dev sample data}}. Every proposal uses
+it unchanged (read it at build time or copy it into the page); none edits it. If a screen needs data the file
+lacks, ask the orchestrator to add it for everyone. Safety: {{e.g. no real IPs, emails, cookies or full ids;
+8-char id prefixes; example.com-style sites; invented names}}.
+
+## References
+- The existing product: `references/before/` {{if any}}
+- Products the owner admires: {{names}}, screenshots in `references/admired/`. The aim is at least as good as these
+  on hierarchy, type and familiarity, and more modern than the category's incumbents.
+- Never copy their assets, names or layouts wholesale; learn from their craft.
+
+## Content rules
+- Screens at full size and full width, one per file. No frames, captions or annotations inside a screen: a screen
+  shows only what the real product would show. Explanation goes in the README.
+- Research words ("hypothesis", "illustrative", "guess", "sample data", "placeholder") never appear in a
+  screen. A disclaimer appears only if the real product would show one.
+- Real copy, in the product's voice; no lorem ipsum. Long names, empty values and large numbers must read well.
+
+## Accessibility floor
+WCAG 2.2 AA: text 4.5:1, non-text (borders, chart marks, focus rings, status fills) 3:1; visible focus; targets
+at least 24 px; status never by colour alone; reduced motion respected; no puzzle tests on pages end users meet
+(3.3.8). Status palette separable under protanopia, deuteranopia and tritanopia (`contrast.mjs --cvd`).
+
+## Product proposal
+Slug `p-{{name}}`. (Folder names are how the scripts tell layers apart: `p-` is the product layer; brand
+directions are `a-…`, `b-…`, `c-…` and never start with `p`.) Refine the existing screens (layout may change, not just styling) or, if nothing exists,
+design them from the jobs above with proven patterns. One readable UI typeface, restrained colour, calm surfaces.
+Each change should trace back to a "Fix" item, a reference, or a screen the product doesn't have yet.
+
+## Brand directions (added after the user approves them)
 | | {{A. Name}} | {{B. Name}} | {{C. Name}} |
 |---|---|---|---|
-| Idea it carries | | | |
-| Brand ↔ product model | one unified / one foundation, two expressions / separate systems | | |
-| Feeling | | | |
-| Colour mood band + ground hex | | | |
-| Colour strategy | | | |
-| Lead type class + families | | | |
-| Tone of voice + three sample lines | | | |
+| Idea | | | |
+| Mood | | | |
+| Colour band + hex | | | |
+| Display face (UI face is the product's) | | | |
+| Tone + three sample lines | | | |
+| Website composition | | | |
+| Signature moments inside the product (at most 2–3) | | | |
 | Unlike competitors because | | | |
-| **Form profile** (see below) | | | |
-| Product screen: the job and its layout idea | | | |
-| Website: composition idea | | | |
-| Sample data set | | | |
-| Must NOT become | | | |
 
-**Form profile** = one line each, chosen so no two directions share more than two:
-- Corners: sharp 0 / small 2–6 / soft 10–16 / round pill 999 / mixed by role (say which)
-- Edges: hairlines / heavy rules (2–4 px) / filled tonal blocks, no borders / depth by shadow or layering
-- Density: product row height and control height in px (e.g. 24/26 compact, 32/36 medium, 44/48 roomy)
-- Button construction: e.g. filled block / text-only with underline / pill / bordered tile with icon / segmented bar
-- Status construction: e.g. dot + word / filled tag / letter cell / outlined stamp / bar in a row / icon only + label on hover (with a11y)
-- Layout grid: e.g. single column / sidebar + content / 12-column with wide gutters / dense split panes / canvas or map
-- Scale contrast: e.g. flat (headline 1.5× body) / dramatic (headline 5× body)
-
-## Same outline in each proposal
-1. **Thesis**: two sentences; which idea; which brand↔product model and why; what is shared and what differs
-   between brand and product (a small diagram beats a sentence).
-2. **Principles**: 3–6, each "so we do / so we don't" + a concrete product example.
-3. **Voice and words**: your assigned tone, with 3 traits; status labels with one-line definitions; button label
-   rules; one error, one empty state, one domain-specific explanation, one marketing headline + subline. The exact
-   status words and the claims we can't make are fixed by this brief; how you say everything else is your tone,
-   and the website copy must sound like it, not like the other proposals. Customer words only.
-4. **Foundations / tokens**: palette; semantic roles; type scale; spacing; the form profile as tokens (radius,
-   border widths, elevation, control and row heights); motion; icon rule. **Contrast table** from the skill's
-   `scripts/contrast.mjs`: every text/surface pair and status colour vs 4.5:1 (text) or 3:1 (non-text). No failure.
-5. **Components**: cover button (primary, secondary, quiet, destructive) across default, hover, focus, disabled
-   and loading; input + filter; tabs; table (`aria-sort`); status badge; panel; banner; empty state; loading;
-   side panel or dialog (name its APG pattern). Keyboard behaviour; 24 px minimum targets. **Present them in
-   your own way**: a states matrix is one option, not the required format.
-6. **Data visualisation**: categorical palette (≤6–8, colour-blind safe), the status palette reused unchanged,
-   sequential ramp, chart rules. Chart types follow your direction's job, not a default stacked bar.
-7. **Composites, built only from the tokens**, each described as a **job**, not a layout:
-   (a) {{product job, e.g. "a customer sees what happened on their site today and why one visit got its verdict"}};
-   (b) {{website job, e.g. "a first-time visitor understands what the product does and why to trust it"}}.
-   Use the layout idea assigned to your direction; don't default to filter row + chart + table + right panel, or to
-   a left-aligned headline with two buttons, unless your direction was assigned it.
-8. **Governance**: who owns look and voice, who owns code, how a change lands (one commit: tokens + docs).
-
-## Files per proposal (`<proposals>/<letter-slug>/`)
-- `index.html`: self-contained (Google Fonts allowed; small vanilla JS fine); CSS custom properties generated
-  from / matching `tokens.json`; responsive to 390 px; visible focus; reduced motion respected.
-- `tokens.json`: DTCG 2025.10; primitive, semantic, component tiers; structure reflects the brand↔product model.
-  Put the form-profile values under clearly named tokens (`radius.*`, `border.width.*`, `size.control.*`,
-  `size.row.*`) so the sameness check can read them.
-- `README.md`: sections 1–4, 6, 8 in prose and tables, including a "Form profile" table.
-- `_build/`: generator and check scripts, so the proposal can be rebuilt later (not /tmp).
-
-## Page frame (identical in every proposal)
-Use the skill's `assets/page-frame.html`: sticky top bar; sticky section list on the left (ids `#thesis
-#principles #voice #foundations #components #dataviz #composites #governance`); current section marked; a
-sideways tab row under 860 px. Style it with the proposal's own tokens. Reserved class names: `topbar`,
-`doc-frame`, `toc`. The frame is the only thing builders copy; don't show them another proposal.
-
-## Sample data
-Safety rules for all: {{e.g. no IPs, emails, cookies or full ids; 8-char id prefixes; example.com-style sites;
-invented names; estimates labelled with a range}}. Each direction gets its **own** sample set (different sites,
-ids, people, numbers and example copy) so shared rows don't make different systems read alike. Real names of
-products, bots or agents are allowed only if described accurately (e.g. ClaudeBot is a crawler, not a shopping
-agent); otherwise invent one.
-
-## Defaults to replace, not just avoid
-For each of these, the builder states in its design plan what it chose instead and why. A list of bans alone
-pushes everyone into the same leftover corner (last time: flat, near-square, 1 px borders for all nine).
-Cream + terracotta; black + one acid accent; broadsheet hairline grids; identical rounded cards with soft shadow
-and gradient washes; ALL-CAPS tracked eyebrows; "A · B · C" meta strings; "→" on every button; 01/02/03 on
-non-sequences; one italic accented word; sci-fi HUD glow; **and the developer-tool default**: near-square corners,
-1 px grey borders, a dark filled primary next to an outlined secondary, left-aligned hero with two buttons,
-dashboard = filter row + KPI tiles + stacked bars + table + right panel; **and the calm-analytics default**: a
-light cool-grey ground, a neutral grotesque sans, blue/red/purple/grey status colours, and polite explainer copy
-("X sits in front of your site…"). Use it only if your row in the table assigns it.
+## Files per proposal (`<proposals>/<slug>/`)
+- `screens/<id>.html`: one page per screen in the set; shared `tokens.css` and `components.css`; small vanilla JS
+  fine; Google Fonts allowed.
+- After the screens are accepted: `tokens.json` (DTCG 2025.10; primitive, semantic, component tiers),
+  `tokens.css` generated from it, `system.html` from the skill's `assets/system-viewer.html`.
+- `README.md`: the idea in two sentences, then each change or decision and why (for a refinement: what changed per
+  screen, linked to the "Fix" list), principles, voice with sample lines.
+- `_build/`: generator and check scripts, screenshots, critiques per round.

@@ -87,6 +87,9 @@ Typical core set for an app with a dashboard: button, input + filter chip, tabs,
 - Health: count raw colours/paddings outside the token file (a cheap lint), per-page overrides, a11y defects.
 
 ## 8. Build order for a small team (no dedicated design-system team)
+This is the order the *documented system* settles in, not the order of design work: this skill designs the key
+screens first and extracts steps 1–4 from them (SKILL.md).
+
 1. Foundations in words: principles, voice and terminology, accessibility target (WCAG 2.2 AA), name existing values.
 2. Tokens: palette, semantic roles, type scale, spacing, radius, elevation; status colours fixed once.
 3. Core components, documented with states and keyboard behaviour (extract from real screens, don't invent).

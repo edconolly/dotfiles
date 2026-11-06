@@ -1,43 +1,66 @@
-# Reviewing proposals (do this yourself; don't trust the builder's report alone)
+# Reviewing proposals (do this yourself; don't trust a builder's report alone)
 
-## Every proposal
-- Run `scripts/check-pages.mjs` on every page at 1440 and 390 px. Then **look** at the screenshots.
-- Check the skeleton: all eight sections, both composites, three files plus `_build/`.
-- Check the brief's product truths: status words, units, time format, sample-data rules (grep for anything
-  that looks like an IP, email or long id).
-- Read the README for claims the product can't back (compliance, certification, measured money).
+## Each craft round
+1. Serve the proposals folder (`python3 -m http.server 8765` from its parent).
+2. `node scripts/screen-set.mjs <proposals> --base http://127.0.0.1:8765/<path> --only <slug>`: overflow, page
+   errors, smallest text, leaked research words, missing screens. Send failures straight back to the builder.
+3. Sheets for the critic, per screen, with `scripts/side-by-side.mjs`, at the same width:
+   - `before` beside the proposal, if a product exists: `--labels "Today,Proposal"`;
+   - the proposal beside one or two admired references: `--labels "Proposal,<Product>,<Product>"`.
+   Use `--crop 1100` for a first-screen view and a second sheet without crop for the full page when it scrolls.
+   One call per width: never mix desktop and phone shots in one sheet.
+   Write them to `<slug>/_build/critique-<n>/`.
+4. Start a fresh critic (prompt below). Save its reply as `<slug>/_build/critique-<n>/critique.md`.
+5. Look at the sheets yourself too. Add anything the critic missed, then send the three worst problems to the
+   builder by its session ID.
 
-## Sameness (check before the user sees anything)
-Run `node scripts/sameness.mjs <proposals> --base http://127.0.0.1:8765/<proposals-path> --out <proposals>/_shots`.
-It prints each proposal's form values (corners, borders, control and row heights), flags pairs alike on 3+ of 4,
-and writes contact sheets of every Components and Composites section side by side. Look at the sheets: numbers
-miss layout and construction (same dashboard layout, same hero, same button pair). If proposals read as one
-product in different colours, fix the brief and rebuild the worst pair before presenting; don't present a set
-that only differs in paint.
+### Critic prompt
+> You are judging screen designs for {{Product}}, {{one sentence: what it does and who uses it}}. Read
+> `{{skill}}/references/craft-rubric.md` and follow it exactly. Then look at every image in
+> `{{slug}}/_build/critique-{{n}}/` and the full screenshots in `{{slug}}/_build/shots/`. Each sheet labels the
+> proposal and the references. Judge only what you see. Reply in the rubric's output format.
 
-## Known pitfalls (each one happened at least once)
+Give the critic nothing else: not the brief, the direction, the builder's plan or earlier critiques. A critic
+who knows the intent grades the intent.
+
+## Brand directions as a set
+Run `node scripts/sameness.mjs <proposals> --base http://127.0.0.1:8765/<path> --out <proposals>/_shots`. It
+compares brand directions only (the product layer is meant to be shared), prints their form values as
+information, and writes one contact sheet per brand screen (`sameness-<id>.png`). Look at the sheets beside the
+competitor contact sheet. Directions that read as one brand in different colours get reassigned and rebuilt
+before the user sees them.
+
+## Every proposal, before presenting
+- Product truths: status words and order, units, time format, number format (grep the screens).
+- Sample data: nothing that looks like a real IP, email or long id; the shared data unchanged.
+- README claims the product can't back (compliance, certification, measured money).
+- For the product proposal: every "Fix" item addressed or explained, every "Keep" item kept.
+- System sheet (once built): `scripts/check-pages.mjs <url>/<slug>/system.html` and the contrast tables.
+
+## Known pitfalls (each happened at least once)
 | Symptom | Cause | Fix |
 |---|---|---|
-| Page scrolls sideways on phones | A grid falls back to `grid-template-columns: 1fr` in a media query; an SVG or table's min-content width then widens the column | Use `minmax(0, 1fr)`; give charts `width: 100%` |
-| Left section list missing mid-page | Class-name clash: the proposal already used `.frame` (or similar) with `overflow: hidden` for a mock window, and the layout reused the name | Reserve `topbar`, `doc-frame`, `toc` for the frame; rename on clash |
-| Sticky list doesn't stick | An ancestor has `overflow: hidden/auto` | Remove it from the frame's ancestors |
-| A wide composite overflows after adding the left column | It "breaks out" with `100vw` / `translateX(-50%)` relative to the old centred column | Inside `.doc-frame`, set the breakout to `width: 100%` |
-| Your edit vanished after a rebuild | The page is generated from a template by the builder's script | Edit the template in `_build/` and rerun the build, not the output |
-| Build script lost | Scripts were left in /tmp | Keep them in `<slug>/_build/` |
-| Browser-panel screenshots don't follow `#hash` navigation | The panel captures the visible top of the page | Use `check-pages.mjs` (headless Chrome) for scrolled shots |
-| Builder subagent fails at once ("model unavailable") | Default model alias not available | Relaunch with an explicit model ID from the models tool |
-| All proposals look like one product in different colours | Brief fixed the screens (recipe) and only assigned surface axes; ban lists pushed everyone into the same corner; shared sample rows; builders shown another proposal | Assign form profiles and layout ideas per direction, describe composites as jobs, give each its own sample data, show builders only the page frame, run `sameness.mjs` |
-| Proposals differ in form but still feel alike (same grey grounds, same sans, same status colours, same voice) | Personality axes left unassigned, so they drift to one model's taste | Assign colour mood band, lead type class and tone per direction; decide status colours explicitly; compare against the competitor sheet |
-| A check reads the wrong current section | Smooth scrolling still running when read | `check-pages.mjs` emulates reduced motion |
-| Colours render black or a size reads "[object Object]" | A semantic token aliases a primitive with the same CSS name, so the variable points to itself; or a DTCG dimension object was printed raw | Name primitives by hue/step, semantics by role; have the build refuse self-references and unformatted values |
-| Hidden pages, panels or slides all show at once | An author `display` rule overrides the `hidden` attribute | Add `[hidden] { display: none !important; }` |
-| Commas and colons look spaced out in prose | Tabular figures (`tnum`) applied to body text | Apply `tnum` only where numbers line up (tables, figures) |
-| A builder keeps colours that fail colour-blindness | The prompt said both "keep these colours" and "must pass" | Say which wins: adjust lightness first, keep hue, report before/after |
-| Sameness flags pairs that clearly look different | Shared floors (24 px targets) counted as form choices | The script skips `target`/`min` tokens; always judge from the contact sheets |
-| A builder's colour-blind "pass" disagrees with yours | Different metric (OKLab distance vs ΔE) | Re-run `contrast.mjs --cvd` and report that number |
+| Proposals pass every check but look worse than the real product | No craft step; rules that rewarded difference; personality in the product layer | The craft loop with a fresh critic and references; variation only in the brand layer |
+| A screen is a costume (field guide, till slip, referee's cards) | Concept first: a metaphor dressed the product | Start from the screen's job; metaphors may only shape a brand mood or one signature moment |
+| A colour or symbol means the opposite of what users expect | Theming renamed the product's things | Product truths in the brief; the critic's familiarity item |
+| "(hypothesis)" or "illustrative" inside a headline | Research labels from the brief copied into copy | Content rules; `screen-set.mjs` scans for them |
+| Screens look like wireframes | Thin invented data, shrunken mock-ups with captions | Shared realistic data; full-size screens; captions only in the README |
+| Specimens look fine, screens look lifeless | System designed before screens | Screens first; extract the system after |
+| Content differences read as design differences | Each proposal had its own sample data | One `data/sample.json` for all |
+| The critic praises the concept | It was given the brief or the builder's reasoning | Give it only images and the rubric |
+| Page scrolls sideways on phones | A grid falls back to `1fr` in a media query; min-content width of an SVG or table widens it | `minmax(0, 1fr)`; charts `width: 100%` |
+| Your edit vanished after a rebuild | The page is generated from a template | Edit the template in `_build/` and rerun |
+| Build script lost | Scripts left in /tmp | Keep them in `<slug>/_build/` |
+| Browser-panel screenshots don't follow `#hash` navigation | The panel captures the visible top | Use the scripts (headless Chrome) for scrolled shots |
+| Builder subagent fails at once ("model unavailable") | The default or long-context variant isn't available | Relaunch with an explicit model ID from the models tool |
+| Colours render black or a size reads "[object Object]" | A semantic token aliases a primitive with the same CSS name; a DTCG dimension object printed raw | Name primitives by hue/step, semantics by role; the build refuses self-references |
+| Hidden panels all show at once | An author `display` rule overrides `hidden` | `[hidden] { display: none !important; }` |
+| Commas look spaced out in prose | `tnum` on body text | `tnum` only where numbers line up |
+| A builder keeps colours that fail colour-blindness | "Keep these colours" and "must pass" both said | Say which wins: keep hue, move lightness, report before/after |
+| A builder's colour-blind "pass" disagrees with yours | Different metric | Re-run `contrast.mjs --cvd` and report that number |
+| The system viewer's shell takes on a proposal's fonts | The proposal styles bare elements (`body`, `h2`) | Scope those styles under `.app` / `.specimen` |
 
 ## Comparison page
-Build `<proposals>/index.html` from `assets/compare-index.html`: a side-by-side table (idea, model, feel,
-core and status swatches, type, density, signature, dark theme, biggest risk) and one screenshot of each
-proposal's composites (`check-pages.mjs` writes them; resize to ~1100 px wide JPEGs in `<proposals>/_shots/`).
-Keep this page visually neutral so it doesn't favour any proposal.
+Build `<proposals>/index.html` from `assets/compare-index.html`: product screens before and after, row by row;
+then each brand screen across directions; then each proposal's links (screens, system sheet, README), strengths
+and biggest risk. Copy or link shots from each `_build/shots/` into `<proposals>/_shots/`. Keep the page neutral.
