@@ -35,6 +35,7 @@ Status: `idea` → `trying` → `adopted` / `dropped`
 
 | Tool | Why I want it | Status | Link |
 |------|---------------|--------|------|
+| Rune | Native, GPU-rendered Rust UI framework (macOS, Windows, Linux, web) by Anomaly; apps run headless so agents can render PNGs and check their own work. Pre-release | idea | [anomalyco/rune](https://github.com/anomalyco/rune) |
 
 ## Adopted
 
